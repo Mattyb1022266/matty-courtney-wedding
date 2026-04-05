@@ -1,0 +1,18 @@
+{
+  "name": "Matty & Courtney · Disney World 2027",
+  "short_name": "Matty & Courtney",
+  "description": "Your guide to the most magical trip ever",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf6f0",
+  "theme_color": "#f7dde0",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

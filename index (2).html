@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#f7dde0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Matty & Courtney">
+
+  <!-- ============================================================
+    WEDDING APP — Matty & Courtney
+    Walt Disney World, 8 April 2027
+
+    HOW TO EDIT THIS FILE:
+    - Open it in GitHub, click the pencil icon (top right of file)
+    - Make your changes in the sections marked with 📝 EDIT HERE
+    - Scroll down to find clearly labelled editable sections
+    - Click "Commit changes" when done — site updates in ~30 seconds
+  ============================================================ -->
+
+  <title>Matty &amp; Courtney · Disney World 2027</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --blush: #f7dde0;
+      --rose: #d4818e;
+      --rosedark: #a85260;
+      --gold: #c9a96e;
+      --cream: #fdf6f0;
+      --petal: #f0c4cb;
+      --softgold: #f5ede0;
+      --text: #5a3040;
+      --muted: #9a7080;
+      --white: #ffffff;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--cream);
+      font-family: 'Lato', sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--cream);
+      position: relative;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; padding-bottom: 90px; min-height: 100vh; }
+    .screen.active { display: block; }
+
+    /* ── HEADER ── */
+    .hdr { text-align: center; padding: 36px 20px 14px; }
+    .hdr-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+    .hdr-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: var(--rosedark); line-height: 1.2; }
+    .hdr-sub { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 5px; }
+    .divider { display: flex; align-items: center; gap: 8px; padding: 0 24px; margin: 12px 0; }
+    .dl { flex: 1; height: 0.5px; background: var(--petal); }
+    .di { color: var(--gold); font-size: 12px; }
+
+    /* ── CARDS ── */
+    .card { background: var(--white); border: 0.5px solid var(--petal); border-radius: 14px; padding: 16px 18px; margin: 0 14px 12px; }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--rosedark); margin-bottom: 8px; }
+    .card-body { font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+    /* ── COUNTDOWN ── */
+    .cd-wrap { padding: 0 14px 4px; }
+    .cd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .cd-box { background: var(--white); border: 0.5px solid var(--petal); border-radius: 12px; padding: 14px 6px; text-align: center; }
+    .cd-num { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--rosedark); line-height: 1; }
+    .cd-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
+
+    /* ── PERK ROWS ── */
+    .perk-row { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 0.5px solid var(--petal); }
+    .perk-row:last-child { border-bottom: none; }
+    .perk-icon { width: 34px; height: 34px; background: var(--blush); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .perk-text strong { font-size: 13px; color: var(--text); font-weight: 700; display: block; margin-bottom: 2px; }
+    .perk-text span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── TIP CARDS ── */
+    .tip-card { background: var(--white); border: 0.5px solid var(--petal); border-radius: 12px; padding: 13px 14px; margin: 0 14px 8px; display: flex; align-items: flex-start; gap: 10px; }
+    .tip-cat { width: 32px; height: 32px; border-radius: 50%; background: var(--blush); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .tip-title { font-size: 13px; color: var(--text); font-weight: 700; margin-bottom: 3px; }
+    .tip-body { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+    /* ── TRANSPORT CARDS ── */
+    .tc { background: var(--white); border: 0.5px solid var(--petal); border-radius: 12px; padding: 14px 16px; margin: 0 14px 10px; }
+    .tc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .tc-icon { width: 36px; height: 36px; background: var(--blush); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .tc-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .tc-sub { font-size: 11px; color: var(--muted); }
+    .tc-body { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+    /* ── FAQ ── */
+    .faq-item { margin: 0 14px 7px; }
+    .faq-q { background: var(--white); border: 0.5px solid var(--petal); border-radius: 10px; padding: 13px 14px; font-size: 13px; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px; user-select: none; }
+    .faq-a { background: var(--blush); border: 0.5px solid var(--petal); border-top: none; border-radius: 0 0 10px 10px; padding: 12px 14px; font-size: 12px; color: var(--muted); line-height: 1.7; display: none; }
+    .faq-a.open { display: block; }
+
+    /* ── SECTION LABEL ── */
+    .slabel { padding: 6px 14px 8px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+    /* ── BADGE ── */
+    .badge { display: inline-block; background: var(--blush); color: var(--rosedark); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-top: 8px; margin-right: 5px; }
+
+    /* ── PHOTOS ── */
+    .upload-area { margin: 0 14px 14px; border: 1.5px dashed var(--rose); border-radius: 14px; padding: 28px 20px; text-align: center; background: rgba(247,221,224,0.12); }
+    .upload-area p { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.65; max-width: 260px; margin-left: auto; margin-right: auto; }
+    .upload-btn { display: inline-block; background: var(--rose); color: #fff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 10px 20px; border-radius: 20px; margin: 6px 4px 0; cursor: pointer; border: none; font-family: 'Lato', sans-serif; }
+    .upload-btn.secondary { background: var(--muted); }
+    .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px; }
+    .photo-ph { background: var(--blush); border-radius: 10px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+    /* ── BOTTOM NAV ── */
+    .nav { display: flex; justify-content: space-around; align-items: center; padding: 8px 0 max(10px, env(safe-area-inset-bottom)); background: rgba(253,246,240,0.97); border-top: 0.5px solid var(--petal); position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; max-width: 430px; margin: 0 auto; }
+    .ni { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; color: var(--muted); cursor: pointer; padding: 4px 6px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.2s; }
+    .ni.active { color: var(--rosedark); }
+    .ni svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── HOTEL HERO ── */
+    .hotel-hero { margin: 0 14px 12px; background: var(--white); border: 0.5px solid var(--petal); border-radius: 14px; overflow: hidden; }
+    .hotel-img { background: linear-gradient(160deg, #f7dde0, #f0c4cb, #e8b0ba); height: 130px; display: flex; align-items: center; justify-content: center; font-size: 52px; }
+    .hotel-body { padding: 14px 16px; }
+    .hotel-name { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--rosedark); margin-bottom: 5px; }
+    .hotel-sub { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+    /* ── DAY REVEAL ── */
+    .reveal-gradient { background: linear-gradient(135deg, #f7dde0, #f5ede0); border: 0.5px solid var(--petal); border-radius: 14px; padding: 24px 20px; margin: 0 14px 14px; text-align: center; }
+    .day-locked-wrap { padding: 50px 20px; text-align: center; }
+
+    /* ── SCHEDULE ROW ── */
+    .sched-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .sched-time { color: var(--gold); font-size: 12px; min-width: 54px; padding-top: 1px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+
+  <!-- ════════════════════════════════════════════
+       SCREEN 1: HOME / COUNTDOWN
+  ════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-home">
+    <div class="hdr">
+      <!-- 📝 EDIT HERE — eyebrow tagline -->
+      <div class="hdr-eyebrow">✦ a magical adventure awaits ✦</div>
+      <!-- 📝 EDIT HERE — couple names -->
+      <div class="hdr-title">Matty &amp; Courtney</div>
+      <!-- 📝 EDIT HERE — trip headline -->
+      <div class="hdr-sub">April 2027 · Walt Disney World</div>
+    </div>
+    <div class="divider"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+
+    <div style="text-align:center;padding:2px 20px 12px;font-size:11px;color:var(--muted);letter-spacing:1px">the big day is in...</div>
+    <div class="cd-wrap">
+      <div class="cd-grid">
+        <div class="cd-box"><div class="cd-num" id="cd-d">--</div><div class="cd-lbl">Days</div></div>
+        <div class="cd-box"><div class="cd-num" id="cd-h">--</div><div class="cd-lbl">Hours</div></div>
+        <div class="cd-box"><div class="cd-num" id="cd-m">--</div><div class="cd-lbl">Mins</div></div>
+        <div class="cd-box"><div class="cd-num" id="cd-s">--</div><div class="cd-lbl">Secs</div></div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin-top:16px"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+
+    <!-- Secret reveal banner — auto changes on REVEAL_DATE -->
+    <div id="reveal-banner"></div>
+
+    <!-- 📝 EDIT HERE — welcome message -->
+    <div class="card">
+      <div class="card-title">Welcome, everyone!</div>
+      <div class="card-body">You're invited on the adventure of a lifetime — two weeks at Walt Disney World with Matty &amp; Courtney. This is your holiday guide to help you get the most out of every magical day. We've kept a few details close to our hearts for now, but everything will be revealed when the moment is right. 🏰</div>
+    </div>
+
+    <!-- 📝 EDIT HERE — trip overview dates/schedule visible to guests -->
+    <div class="card">
+      <div class="card-title">Your trip at a glance</div>
+      <div class="card-body">
+        <div class="sched-row"><div class="sched-time">1 Apr</div><div>Arrive in Orlando — welcome to the magic! Check in to All Star Movies Resort</div></div>
+        <div class="sched-row"><div class="sched-time">2–7 Apr</div><div>Explore all four parks, Disney Springs &amp; the resort pools</div></div>
+        <div class="sched-row" style="color:var(--rosedark)"><div class="sched-time" style="color:var(--rosedark);font-weight:700">8 Apr ✨</div><div style="font-weight:700">The big day — full details revealed tomorrow!</div></div>
+        <div class="sched-row"><div class="sched-time">9–15 Apr</div><div>More magic, memories &amp; celebrating together</div></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SCREEN 2: HOTEL
+  ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-hotel">
+    <div class="hdr">
+      <div class="hdr-eyebrow">your home away from home</div>
+      <div class="hdr-title">All Star Movies</div>
+      <!-- 📝 EDIT HERE — hotel subtitle -->
+      <div class="hdr-sub">Disney's Value Resort · Walt Disney World</div>
+    </div>
+    <div class="divider"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+
+    <div class="hotel-hero">
+      <div class="hotel-img">🎬</div>
+      <div class="hotel-body">
+        <!-- 📝 EDIT HERE — hotel name & description -->
+        <div class="hotel-name">Disney's All Star Movies Resort</div>
+        <div class="hotel-sub">Larger-than-life movie theming — think giant Toy Story characters, 101 Dalmatians, Fantasia &amp; more. An iconic Disney resort packed with character and brilliant value.</div>
+        <div><span class="badge">Value Resort</span><span class="badge">On-property</span><span class="badge">14 nights</span></div>
+      </div>
+    </div>
+
+    <div class="slabel">resort perks — included in your stay</div>
+    <!-- 📝 EDIT HERE — resort perks list -->
+    <div class="card" style="padding-top:8px">
+      <div class="perk-row">
+        <div class="perk-icon">🚌</div>
+        <div class="perk-text"><strong>Free Disney transport</strong><span>Buses to all 4 parks, water parks &amp; Disney Springs — no hire car needed at all</span></div>
+      </div>
+      <div class="perk-row">
+        <div class="perk-icon">⏰</div>
+        <div class="perk-text"><strong>30-min early park entry</strong><span>Get into all 4 parks 30 minutes before the public every single day of your stay</span></div>
+      </div>
+      <div class="perk-row">
+        <div class="perk-icon">📅</div>
+        <div class="perk-text"><strong>Priority dining reservations</strong><span>Book the most popular Disney restaurants 60 days in advance — before non-resort guests</span></div>
+      </div>
+      <div class="perk-row">
+        <div class="perk-icon">🏊</div>
+        <div class="perk-text"><strong>Two resort pools</strong><span>The Fantasia pool &amp; the Mighty Ducks pool — plus a children's splash area and playground</span></div>
+      </div>
+      <div class="perk-row">
+        <div class="perk-icon">🎬</div>
+        <div class="perk-text"><strong>Movies Under the Stars</strong><span>Free outdoor Disney film screenings most evenings — grab a blanket and enjoy!</span></div>
+      </div>
+      <div class="perk-row">
+        <div class="perk-icon">📱</div>
+        <div class="perk-text"><strong>MagicBand &amp; mobile check-in</strong><span>Your wristband or phone is your room key, park ticket and payment card all in one</span></div>
+      </div>
+    </div>
+
+    <div class="slabel">good to know</div>
+    <!-- 📝 EDIT HERE — hotel tips -->
+    <div class="card">
+      <div class="card-body">
+        <div style="margin-bottom:9px">🛏️ Rooms sleep up to 4 — includes a fridge, coffee maker, safe &amp; free Wi-Fi.</div>
+        <div style="margin-bottom:9px">🍽️ The World Premiere Food Court serves breakfast, lunch &amp; dinner from 6:30am. The Mickey waffles are absolutely worth it.</div>
+        <div style="margin-bottom:9px">🎯 Request the <strong>Toy Story section</strong> when checking in — best photo spots and closest to the pool.</div>
+        <div style="margin-bottom:9px">🧺 Self-service laundry is on-site — really handy for a 14-night stay!</div>
+        <div>🛒 The hotel shop stocks basics like sunscreen, medicine, snacks and Disney souvenirs so you won't be stuck if you forget anything.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SCREEN 3: TIPS
+  ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-tips">
+    <div class="hdr">
+      <div class="hdr-eyebrow">first-timer's guide</div>
+      <div class="hdr-title">Disney Tips</div>
+      <div class="hdr-sub">Making the most of every day</div>
+    </div>
+    <div class="divider"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+
+    <!-- 📝 EDIT HERE — add, remove or change any tip cards below -->
+    <!-- Each tip card follows this pattern:
+         <div class="tip-card">
+           <div class="tip-cat">EMOJI</div>
+           <div><div class="tip-title">Title here</div><div class="tip-body">Body text here</div></div>
+         </div>
+    -->
+
+    <div class="slabel">before you arrive</div>
+    <div class="tip-card"><div class="tip-cat">📱</div><div><div class="tip-title">Download My Disney Experience</div><div class="tip-body">Your essential Disney app. Check live ride wait times, mobile order food, book Lightning Lane passes &amp; navigate all four parks. Download before you fly and set it up.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">⌚</div><div><div class="tip-title">Get a MagicBand or use your phone</div><div class="tip-body">Your MagicBand is your room key, park ticket and payment card on your wrist. You can buy one at the hotel or just use the Disney app on your phone — both work perfectly.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🎢</div><div><div class="tip-title">Book Lightning Lane passes early</div><div class="tip-body">Lightning Lane is Disney's skip-the-queue system. As resort guests you can book up to 7 days before each park visit. The most popular rides go fast — book first thing each morning.</div></div></div>
+
+    <div class="slabel" style="margin-top:6px">in the parks</div>
+    <div class="tip-card"><div class="tip-cat">🌅</div><div><div class="tip-title">Use your early entry every single day</div><div class="tip-body">30 minutes before the public opens the gates is worth more than any paid pass. Head straight for the busiest rides — queues are a fraction of what they'll be by 10am.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🌦️</div><div><div class="tip-title">Expect afternoon rain — don't panic</div><div class="tip-body">April in Florida means short, sharp afternoon thunderstorms. Pack a small poncho (not an umbrella — too awkward). The rain usually clears within 30 minutes and the air cools beautifully.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">💧</div><div><div class="tip-title">Free iced water everywhere</div><div class="tip-body">Any quick-service restaurant in the parks will give you a free cup of iced water if you ask. Bring a refillable bottle — there are water fill stations throughout all four parks.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🍔</div><div><div class="tip-title">Mobile order your food</div><div class="tip-body">Use My Disney Experience to pre-order from counter service restaurants. You skip the queue entirely and just collect when it's ready. Saves loads of time at busy lunch periods.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">👟</div><div><div class="tip-title">Wear the most comfortable shoes you own</div><div class="tip-body">You will walk 15,000–25,000 steps a day at Disney. Blisters will ruin your trip faster than anything else. No new shoes — wear your most broken-in, comfortable trainers.</div></div></div>
+
+    <div class="slabel" style="margin-top:6px">saving money</div>
+    <div class="tip-card"><div class="tip-cat">💳</div><div><div class="tip-title">Use a fee-free travel card</div><div class="tip-body">Monzo, Starling and Chase are all brilliant for the US — no foreign transaction fees and great exchange rates. Set one up before you fly and use it for everything.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🎁</div><div><div class="tip-title">Buy souvenirs on your last day</div><div class="tip-body">With 14 days there's no rush! Disney lets you ship purchases to the resort hotel so you don't carry anything around the parks. Don't blow the budget on day one.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🧃</div><div><div class="tip-title">Get a Rapid Fill mug at the hotel</div><div class="tip-body">One mug (~$23) gets you unlimited soft drinks and hot drinks from the resort food court for your entire 14-night stay. Easily the best value purchase of the whole trip.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🎪</div><div><div class="tip-title">Take a rest day — you'll need it</div><div class="tip-body">With 14 days you don't need a park every day. The resort pool, Disney Springs (free entry, great food and shopping) or just a lie-in are all valid options. The parks are exhausting!</div></div></div>
+
+    <div class="slabel" style="margin-top:6px">uk-specific tips</div>
+    <div class="tip-card"><div class="tip-cat">✈️</div><div><div class="tip-title">Getting from the airport to the resort</div><div class="tip-body">Disney's old free Magical Express no longer runs. From Orlando Airport (MCO), take a Mears Connect shuttle or Uber/Lyft — about $35–45 and a 30-minute drive. Book Mears in advance at mearstransportation.com.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🕐</div><div><div class="tip-title">Jet lag is real — plan for it</div><div class="tip-body">Orlando is 5 hours behind the UK. You'll likely wake at 5am for the first few days — actually brilliant for early park entry! Don't plan anything too late on your first evening.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🌡️</div><div><div class="tip-title">April weather in Florida</div><div class="tip-body">Expect 27–30°C (80–86°F) with sunshine and humidity. Pack light breathable clothing, good walking shoes, SPF50+ sunscreen and sunglasses. Evenings can be slightly cooler so bring a light layer.</div></div></div>
+    <div class="tip-card"><div class="tip-cat">🔌</div><div><div class="tip-title">US plugs &amp; power</div><div class="tip-body">The US uses Type A/B plugs at 120V. Bring a universal travel adaptor. Most modern phone chargers are dual voltage (check for 100–240V on the plug) so they'll work fine with just an adaptor.</div></div></div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SCREEN 4: TRANSPORT
+  ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-transport">
+    <div class="hdr">
+      <div class="hdr-eyebrow">getting around</div>
+      <div class="hdr-title">Transport</div>
+      <div class="hdr-sub">Disney World is brilliantly connected</div>
+    </div>
+    <div class="divider"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+
+    <!-- 📝 EDIT HERE — intro transport message -->
+    <div class="card">
+      <div class="card-body">As resort guests at All Star Movies, <strong>all Disney transport is completely free</strong>. You genuinely don't need a hire car — Disney's system covers everywhere you'll want to go.</div>
+    </div>
+
+    <!-- 📝 EDIT HERE — transport options -->
+    <div class="tc">
+      <div class="tc-head"><div class="tc-icon">🚌</div><div><div class="tc-title">Disney Buses</div><div class="tc-sub">Main transport from All Star Movies</div></div></div>
+      <div class="tc-body">Direct buses run from All Star Movies to all 4 parks, both water parks and Disney Springs. A tip: All Star Movies is usually the last stop on the route so allow extra time. Aim to catch the bus 60 minutes before your target park opens to make the most of early entry.</div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head"><div class="tc-icon">🚡</div><div><div class="tc-title">Disney Skyliner</div><div class="tc-sub">Gondola gondola system — worth experiencing</div></div></div>
+      <div class="tc-body">The Skyliner gondola connects several resorts to EPCOT and Hollywood Studios. You can't board it directly from All Star Movies, but hop on a bus to Pop Century Resort and jump on from there. The views from 60ft up are spectacular — absolutely worth doing at least once.</div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head"><div class="tc-icon">🚝</div><div><div class="tc-title">Monorail</div><div class="tc-sub">Magic Kingdom &amp; EPCOT loop</div></div></div>
+      <div class="tc-body">The monorail loops between Magic Kingdom, the Grand Floridian, Polynesian, Contemporary resorts and EPCOT. Take a bus to Magic Kingdom, then ride the monorail onward — it's a classic Disney experience and the views of Cinderella Castle are stunning.</div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head"><div class="tc-icon">🚤</div><div><div class="tc-title">Ferry Boats</div><div class="tc-sub">Magic Kingdom approach</div></div></div>
+      <div class="tc-body">A large ferry boat crosses the Seven Seas Lagoon to Magic Kingdom from the Transportation &amp; Ticket Center. It's slower than the monorail but far more scenic — a proper Disney arrival moment. Highly recommended for your first Magic Kingdom visit.</div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head"><div class="tc-icon">🚗</div><div><div class="tc-title">Uber &amp; Lyft</div><div class="tc-sub">For quick trips or days out</div></div></div>
+      <div class="tc-body">Both apps work perfectly at Disney World. Great if you want a day at Universal Studios (about 20 mins away) or if bus waits get long. Minnie Vans are Disney-themed Lyfts seating up to 6 — fun but 2–3x more expensive than a regular Lyft. Regular rideshare costs around £10–20 within the resort area.</div>
+    </div>
+
+    <div class="tip-card" style="margin-top:4px">
+      <div class="tip-cat">💡</div>
+      <div><div class="tip-title">Check the app before heading out</div><div class="tip-body">My Disney Experience shows live bus wait times. Check it before leaving your room — if a bus is 5 mins away, you can time your walk perfectly.</div></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SCREEN 5: THE BIG DAY (locked until reveal date)
+  ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-day">
+    <div class="hdr">
+      <div class="hdr-eyebrow">✦ something very special ✦</div>
+      <div class="hdr-title">The Big Day</div>
+      <div class="hdr-sub">8 April 2027</div>
+    </div>
+    <div class="divider"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+    <!-- Content injected by JavaScript based on date -->
+    <div id="day-content"></div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SCREEN 6: PHOTOS
+  ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-photos">
+    <div class="hdr">
+      <div class="hdr-eyebrow">share the magic</div>
+      <div class="hdr-title">Your Photos</div>
+      <!-- 📝 EDIT HERE — photos subtitle -->
+      <div class="hdr-sub">Capture every magical moment</div>
+    </div>
+    <div class="divider"><div class="dl"></div><div class="di">✦</div><div class="dl"></div></div>
+
+    <div class="upload-area">
+      <div style="font-size:36px">📷</div>
+      <!-- 📝 EDIT HERE — upload prompt text -->
+      <p>Snap a memory and share it with us — your photos go straight to Matty &amp; Courtney and we can download every single one</p>
+      <button class="upload-btn" onclick="triggerCamera()">📷 Take a Photo</button>
+      <button class="upload-btn secondary" onclick="triggerGallery()">🖼️ From Gallery</button>
+      <input type="file" id="cam-input" accept="image/*" capture="environment" style="display:none" onchange="handleUpload(this)">
+      <input type="file" id="gal-input" accept="image/*" style="display:none" onchange="handleUpload(this)">
+    </div>
+
+    <div class="slabel">recently shared</div>
+    <div class="photo-grid" id="photo-grid">
+      <div class="photo-ph">🌸</div>
+      <div class="photo-ph">✨</div>
+      <div class="photo-ph">🏰</div>
+      <div class="photo-ph">💍</div>
+    </div>
+    <div style="text-align:center;padding:14px 14px 0;font-size:11px;color:var(--muted);line-height:1.6">Photos you share go directly to Matty &amp; Courtney's album.<br>They'll be able to download them all.</div>
+
+    <!-- FAQ section on photos screen -->
+    <div class="slabel" style="margin-top:16px">got a question?</div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What should I wear on the day?</span><span>+</span></div><div class="faq-a">Smart/formal attire please — but make sure your shoes are comfortable as you'll be doing a fair bit of walking. Ladies, cobblestones are not stiletto-friendly! The vibe is elegant but this is Disney — have a bit of fun with it.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Are children welcome?</span><span>+</span></div><div class="faq-a">Absolutely — this is Disney World! Little ones are very welcome at all parts of the day. The more the merrier.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Do I need a park ticket for the 8th?</span><span>+</span></div><div class="faq-a">Details about tickets for the celebrations will be included in the big reveal. Keep an eye on The Big Day tab — everything you need will be there.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Is food and drink provided?</span><span>+</span></div><div class="faq-a">Yes! There will be a reception with food and drinks. We also have a few surprises up our sleeve — more details in the big reveal on 7 April.</div></div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       BOTTOM NAVIGATION
+  ════════════════════════════════════════════ -->
+  <div class="nav">
+    <div class="ni active" id="ni-home" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Home
+    </div>
+    <div class="ni" id="ni-hotel" onclick="goTo('hotel')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Hotel
+    </div>
+    <div class="ni" id="ni-tips" onclick="goTo('tips')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>Tips
+    </div>
+    <div class="ni" id="ni-transport" onclick="goTo('transport')">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Travel
+    </div>
+    <div class="ni" id="ni-day" onclick="goTo('day')">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>The Day
+    </div>
+    <div class="ni" id="ni-photos" onclick="goTo('photos')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photos
+    </div>
+  </div>
+
+</div><!-- end .app -->
+
+
+<script>
+  // ============================================================
+  // 📝 EDIT HERE — KEY DATES
+  // Format: new Date('YYYY-MM-DDTHH:MM:SS')
+  // ============================================================
+  const WEDDING_DATE   = new Date('2027-04-08T14:00:00'); // Wedding day & time
+  const REVEAL_DATE    = new Date('2027-04-07T06:00:00'); // When the secret unlocks (eve of wedding)
+
+  // ============================================================
+  // 📝 EDIT HERE — PERSONAL MESSAGE (shown on reveal day)
+  // This appears on The Big Day screen after REVEAL_DATE passes
+  // Use &amp; for & and &#39; for apostrophes inside the string
+  // ============================================================
+  const PERSONAL_MESSAGE = `"If you're reading this, tomorrow is finally here. You've travelled across the world to be with us and we're overwhelmed with love for every single one of you. There's something we've been keeping very close to our hearts... we're getting married tomorrow, right here at Walt Disney World — and we want you there with us. We couldn't imagine sharing this day with anyone else in the world. Get some rest tonight, dress your best, and prepare to be completely surprised."`;
+
+  // ============================================================
+  // 📝 EDIT HERE — WEDDING DAY SCHEDULE (shown after REVEAL_DATE)
+  // Add or remove rows as needed
+  // ============================================================
+  const DAY_SCHEDULE = [
+    { time: '12:00pm', text: 'Guests to gather in the hotel lobby — transport is all arranged' },
+    { time: '2:00pm',  text: 'Wedding ceremony — Disney\'s Wedding Pavilion ⛪' },
+    { time: '4:00pm',  text: 'Celebrations begin at EPCOT ✨ — transport provided for everyone' },
+    { time: 'Evening', text: 'Dinner, dancing & more surprises to be revealed on the day...' },
+  ];
+
+  // ============================================================
+  // COUNTDOWN TIMER
+  // ============================================================
+  function updateCountdown() {
+    const diff = WEDDING_DATE - new Date();
+    if (diff <= 0) {
+      ['d','h','m','s'].forEach(k => document.getElementById('cd-' + k).textContent = '0');
+      return;
+    }
+    document.getElementById('cd-d').textContent = Math.floor(diff / 86400000);
+    document.getElementById('cd-h').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ============================================================
+  // REVEAL BANNER (home screen)
+  // ============================================================
+  function renderRevealBanner() {
+    const now = new Date();
+    const el = document.getElementById('reveal-banner');
+    if (now >= REVEAL_DATE) {
+      el.innerHTML = `
+        <div style="background:linear-gradient(135deg,#f7dde0,#f5ede0);border:0.5px solid var(--petal);border-radius:14px;padding:20px 18px;text-align:center;margin:0 14px 14px">
+          <div style="font-size:30px;margin-bottom:10px">💍✨</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--rosedark);margin-bottom:8px">Tomorrow is the day!</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">Head to <strong style="color:var(--rosedark)">The Big Day</strong> tab to read a personal message from Matty &amp; Courtney and find out everything planned for tomorrow.</div>
+        </div>`;
+    } else {
+      const days = Math.floor((REVEAL_DATE - now) / 86400000);
+      el.innerHTML = `
+        <div style="background:var(--softgold);border:0.5px solid var(--petal);border-radius:14px;padding:18px 18px;text-align:center;margin:0 14px 14px">
+          <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">a secret is coming...</div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--rosedark);margin-bottom:6px">Something special is planned for 8 April</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65">We have a magical surprise for you all. The full details will be revealed right here in <strong style="color:var(--rosedark)">${days} day${days !== 1 ? 's' : ''}</strong> — on the eve of the big day.</div>
+          <div style="display:inline-block;background:var(--blush);color:var(--rosedark);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-top:10px">Reveals 7 April 2027</div>
+        </div>`;
+    }
+  }
+  renderRevealBanner();
+
+  // ============================================================
+  // THE BIG DAY SCREEN CONTENT
+  // ============================================================
+  function renderDayTab() {
+    const now = new Date();
+    const el = document.getElementById('day-content');
+    const daysLeft = Math.floor((WEDDING_DATE - now) / 86400000);
+    if (now >= REVEAL_DATE) {
+      const scheduleRows = DAY_SCHEDULE.map(r =>
+        `<div class="sched-row"><div class="sched-time">${r.time}</div><div>${r.text}</div></div>`
+      ).join('');
+      el.innerHTML = `
+        <div class="reveal-gradient">
+          <div style="font-size:38px;margin-bottom:14px">💍🏰✨</div>
+          <div style="font-family:'Playfair Display',serif;font-size:19px;color:var(--rosedark);margin-bottom:14px">A message from Matty &amp; Courtney</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.85;font-style:italic;font-family:'Playfair Display',serif">${PERSONAL_MESSAGE}</div>
+          <div style="margin-top:14px;font-size:14px;color:var(--rosedark);font-family:'Playfair Display',serif">— Matty &amp; Courtney 💕</div>
+        </div>
+        <div class="slabel">tomorrow's schedule</div>
+        <div class="card"><div class="card-body">${scheduleRows}</div></div>
+        <div class="card">
+          <div class="card-title">What to wear</div>
+          <div class="card-body">Smart/formal attire please — but comfortable shoes are absolutely essential as you'll be walking around EPCOT. Ladies, cobblestones are not stiletto-friendly! The vibe is elegant but this is Disney — have fun with it.</div>
+        </div>`;
+    } else {
+      el.innerHTML = `
+        <div class="day-locked-wrap">
+          <div style="font-size:52px;margin-bottom:18px">🔒</div>
+          <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--rosedark);margin-bottom:12px">Surprises are coming...</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8;max-width:270px;margin:0 auto">Matty &amp; Courtney have something very special planned for 8 April. A personal message and the full details will appear here on the eve of the big day — ${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go!</div>
+          <div style="display:inline-block;background:var(--blush);color:var(--rosedark);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:5px 16px;border-radius:20px;margin-top:16px">Unlocks 7 April 2027</div>
+        </div>`;
+    }
+  }
+  renderDayTab();
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+  function goTo(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    document.getElementById('ni-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ============================================================
+  // FAQ TOGGLE
+  // ============================================================
+  function toggleFaq(el) {
+    const ans = el.nextElementSibling;
+    const isOpen = ans.classList.contains('open');
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-q span:last-child').forEach(s => s.textContent = '+');
+    if (!isOpen) { ans.classList.add('open'); el.querySelector('span:last-child').textContent = '−'; }
+  }
+
+  // ============================================================
+  // PHOTO UPLOAD (opens camera or gallery)
+  // ============================================================
+  function triggerCamera()  { document.getElementById('cam-input').click(); }
+  function triggerGallery() { document.getElementById('gal-input').click(); }
+
+  function handleUpload(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const grid = document.getElementById('photo-grid');
+        const div = document.createElement('div');
+        div.style.cssText = 'border-radius:10px;aspect-ratio:1;overflow:hidden;';
+        div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+        grid.insertBefore(div, grid.firstChild);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // ============================================================
+  // SERVICE WORKER REGISTRATION
+  // ============================================================
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .catch(err => console.log('SW registration failed:', err));
+  }
+</script>
+</body>
+</html>
