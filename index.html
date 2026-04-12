@@ -40,74 +40,110 @@
           slidedown: {
             prompts: [{
               type: "push",
-              autoPrompt: true,
+              autoPrompt: false,
               text: {
-                actionMessage: "Matty & Courtney want to send you surprise announcements during the trip! Allow notifications?",
+                actionMessage: "Matty & Courtney want to send you surprise announcements during the trip!",
                 acceptButton: "Yes please!",
                 cancelButton: "Maybe later"
-              },
-              delay: { pageViews: 1, timeDelay: 2 }
+              }
             }]
           }
         }
       });
-
-      // Check permission state and prompt if not yet decided
-      const permission = await OneSignal.Notifications.permissionNative;
-      if (permission === 'default') {
-        setTimeout(async () => {
-          await OneSignal.Slidedown.promptPush({ force: true });
-        }, 2000);
-      }
     });
 
-    // Fallback: show a manual "Enable notifications" button if prompt doesn't fire
+    // Detect platform
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true ||
+                         window.matchMedia('(display-mode: standalone)').matches;
+
     window.addEventListener('load', function() {
       setTimeout(function() {
-        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-        const isStandalone = window.navigator.standalone === true;
-        if (isIOS && isStandalone && Notification.permission === 'default') {
-          showNotifyBanner();
+        const permission = typeof Notification !== 'undefined' ? Notification.permission : 'denied';
+        if (permission === 'granted') return; // Already enabled — do nothing
+
+        if (isIOS && isStandalone) {
+          showIOSGuide();
+        } else if (isAndroid || (!isIOS && permission === 'default')) {
+          showAndroidPrompt();
         }
-      }, 3000);
+      }, 2500);
     });
 
-    function showNotifyBanner() {
+    function showIOSGuide() {
       if (document.getElementById('notify-banner')) return;
       const banner = document.createElement('div');
       banner.id = 'notify-banner';
-      banner.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:200;background:#fff;border:1.5px solid #f0c4cb;border-radius:14px;padding:14px 16px;box-shadow:0 4px 20px rgba(168,82,96,0.15);display:flex;align-items:center;gap:12px;max-width:400px;margin:0 auto';
+      banner.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:200;background:#fff;border:1.5px solid #f0c4cb;border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(168,82,96,0.18);max-width:400px;margin:0 auto;font-family:Lato,sans-serif';
       banner.innerHTML = `
-        <div style="font-size:26px">🔔</div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:700;color:#5a3040;margin-bottom:3px">Get surprise announcements!</div>
-          <div style="font-size:11px;color:#9a7080;line-height:1.5">Matty & Courtney will send notifications during the trip</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-size:26px">🔔</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#5a3040">Get surprise announcements!</div>
+            <div style="font-size:11px;color:#9a7080">From Matty & Courtney during the trip</div>
+          </div>
+          <button onclick="document.getElementById('notify-banner').remove()" style="margin-left:auto;background:none;border:none;color:#9a7080;font-size:18px;cursor:pointer;padding:0 4px">×</button>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <button onclick="enableNotifications()" style="background:#d4818e;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:Lato,sans-serif;white-space:nowrap">Enable ✓</button>
-          <button onclick="document.getElementById('notify-banner').remove()" style="background:none;border:none;color:#9a7080;font-size:11px;cursor:pointer;font-family:Lato,sans-serif">Not now</button>
+        <div style="background:#fdf6f0;border-radius:10px;padding:11px 13px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;color:#a85260;margin-bottom:6px;letter-spacing:0.5px">TO ENABLE ON IPHONE:</div>
+          <div style="font-size:12px;color:#5a3040;line-height:1.8">
+            1. Open your iPhone <strong>Settings</strong><br>
+            2. Scroll down and tap <strong>Safari</strong><br>
+            3. Tap <strong>Notifications</strong><br>
+            4. Find <strong>matty-courtney-wedding</strong><br>
+            5. Toggle <strong>Allow Notifications ON</strong><br>
+            6. Come back and reopen the app
+          </div>
+        </div>
+        <button onclick="document.getElementById('notify-banner').remove()" style="width:100%;background:#d4818e;color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:Lato,sans-serif;letter-spacing:0.5px">Got it!</button>`;
+      document.body.appendChild(banner);
+    }
+
+    function showAndroidPrompt() {
+      if (document.getElementById('notify-banner')) return;
+      const banner = document.createElement('div');
+      banner.id = 'notify-banner';
+      banner.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:200;background:#fff;border:1.5px solid #f0c4cb;border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(168,82,96,0.18);max-width:400px;margin:0 auto;font-family:Lato,sans-serif';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-size:26px">🔔</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#5a3040">Get surprise announcements!</div>
+            <div style="font-size:11px;color:#9a7080">Matty & Courtney will notify you during the trip</div>
+          </div>
+          <button onclick="document.getElementById('notify-banner').remove()" style="margin-left:auto;background:none;border:none;color:#9a7080;font-size:18px;cursor:pointer;padding:0 4px">×</button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="document.getElementById('notify-banner').remove()" style="flex:1;background:#f0c4cb;color:#a85260;border:none;border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:Lato,sans-serif">Maybe later</button>
+          <button onclick="enableNotificationsAndroid()" style="flex:2;background:#d4818e;color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:Lato,sans-serif;font-weight:700">Enable notifications ✓</button>
         </div>`;
       document.body.appendChild(banner);
     }
 
-    async function enableNotifications() {
+    async function enableNotificationsAndroid() {
       document.getElementById('notify-banner')?.remove();
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.Slidedown.promptPush({ force: true });
-        const granted = await OneSignal.Notifications.requestPermission();
-        if (granted) {
-          const tick = document.createElement('div');
-          tick.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#a85260;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:300;font-family:Lato,sans-serif';
-          tick.textContent = '✓ Notifications enabled!';
-          document.body.appendChild(tick);
-          setTimeout(() => tick.remove(), 3000);
-        }
       });
     }
+
+    // Global function so admin can re-trigger notification prompt manually
+    window.retriggerNotifications = function() {
+      const permission = typeof Notification !== 'undefined' ? Notification.permission : 'denied';
+      if (permission === 'granted') {
+        alert('Notifications are already enabled on this device! ✓');
+        return;
+      }
+      if (isIOS) {
+        showIOSGuide();
+      } else {
+        showAndroidPrompt();
+      }
+    };
   </script>
 
-  <!-- iOS Safari Web Push support — must be in <head> -->
+  <!-- iOS Safari Web Push support -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Matty &amp; Courtney">
@@ -297,6 +333,9 @@
     <div class="card">
       <div class="card-title">Welcome, everyone!</div>
       <div class="card-body">You're invited on the adventure of a lifetime — two weeks at Walt Disney World with Matty &amp; Courtney. This is your holiday guide to help you get the most out of every magical day. We've kept a few details close to our hearts for now, but everything will be revealed when the moment is right. 🏰</div>
+      <div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--petal)">
+        <button onclick="retriggerNotifications()" style="width:100%;background:var(--blush);color:var(--rosedark);border:0.5px solid var(--petal);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:0.5px">🔔 Enable surprise announcements</button>
+      </div>
     </div>
 
     <!-- 📝 EDIT HERE — trip overview dates/schedule visible to guests -->
