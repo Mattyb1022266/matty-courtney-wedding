@@ -12,22 +12,60 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Handle background push notifications
+// Handle background messages from Firebase
 messaging.onBackgroundMessage(function(payload) {
-  const { title, body } = payload.notification;
-  self.registration.showNotification(title, {
+  console.log('Background message received:', payload);
+
+  const title = payload.notification?.title || 'Matty & Courtney ✨';
+  const body  = payload.notification?.body  || payload.data?.body || 'New announcement!';
+
+  return self.registration.showNotification(title, {
     body,
-    icon:  '/icon.png',
-    badge: '/icon.png',
+    icon:    '/icon.png',
+    badge:   '/icon.png',
     vibrate: [200, 100, 200],
+    tag:     'wedding-announcement',
+    renotify: true,
+    requireInteraction: true,
     data: { url: 'https://matty-courtney-wedding.matty-b60.workers.dev' }
   });
+});
+
+// Raw push fallback — catches anything Firebase misses
+self.addEventListener('push', function(event) {
+  console.log('Raw push received');
+  if (!event.data) return;
+
+  let payload;
+  try { payload = event.data.json(); }
+  catch(e) { payload = { notification: { title: 'Matty & Courtney ✨', body: event.data.text() } }; }
+
+  const title = payload.notification?.title || 'Matty & Courtney ✨';
+  const body  = payload.notification?.body  || payload.data?.body || 'New announcement!';
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon:    '/icon.png',
+      badge:   '/icon.png',
+      vibrate: [200, 100, 200],
+      tag:     'wedding-announcement',
+      renotify: true,
+      data:    { url: 'https://matty-courtney-wedding.matty-b60.workers.dev' }
+    })
+  );
 });
 
 // Click notification → open app
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
+  const url = event.notification.data?.url || 'https://matty-courtney-wedding.matty-b60.workers.dev';
   event.waitUntil(
-    clients.openWindow('https://matty-courtney-wedding.matty-b60.workers.dev')
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      for (const client of clientList) {
+        if (client.url === url && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
   );
 });
