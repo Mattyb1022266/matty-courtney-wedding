@@ -34,6 +34,8 @@
       await OneSignal.init({
         appId: "608f5205-38ce-4d61-afcb-201301a315ab",
         notifyButton: { enable: false },
+        serviceWorkerParam: { scope: "/" },
+        serviceWorkerPath: "OneSignalSDKWorker.js",
         promptOptions: {
           slidedown: {
             prompts: [{
@@ -49,8 +51,16 @@
           }
         }
       });
+
+      // Re-prompt anyone who previously dismissed
+      OneSignal.Slidedown.promptPush();
     });
   </script>
+
+  <!-- iOS Safari Web Push support — must be in <head> -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Matty &amp; Courtney">
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -964,7 +974,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic YOUR_REST_API_KEY'
+            'Authorization': 'Basic os_v2_app_mchvebjyzzgwdl6leajqdiyvvp7ukppri7de6hukp3ei3ovgyjamek25z6k4kqycvukce5lhladjjhardxgo5b2vtyjlcbz2aav6ani'
           },
           body: JSON.stringify({
             app_id: '608f5205-38ce-4d61-afcb-201301a315ab',
