@@ -27,10 +27,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <!-- Firebase Cloud Messaging -->
-  <script type="module">
-    import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js';
-
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
+  <script>
     const firebaseConfig = {
       apiKey:            "AIzaSyDfhLutM-WEKvI0b7ygZpCcXCvSl8TK1x4",
       authDomain:        "wedding-notifications-606ad.firebaseapp.com",
@@ -40,49 +39,78 @@
       appId:             "1:397211596151:web:6cda670dd7debfeebedd72"
     };
 
-    const VAPID_KEY    = 'BLutrcIVQRnUUQKTuWHXjeln8Sep5AGSmylUn-kFKzHK51OMIdHRAAhi--NyksdIg386c_BpOtNt85a77pL5Tao';
-    const BACKEND_URL  = 'https://wedding-push-backend-production.up.railway.app';
-
+    const VAPID_KEY   = 'BLutrcIVQRnUUQKTuWHXjeln8Sep5AGSmylUn-kFKzHK51OMIdHRAAhi--NyksdIg386c_BpOtNt85a77pL5Tao';
+    const BACKEND_URL = 'https://wedding-push-backend-production.up.railway.app';
     window.BACKEND_URL = BACKEND_URL;
 
-    async function initFirebasePush() {
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    window.initFirebasePush = async function() {
       try {
-        const firebaseApp = initializeApp(firebaseConfig);
-        const messaging   = getMessaging(firebaseApp);
-
+        // Request permission
         const permission = await Notification.requestPermission();
-        if (permission !== 'granted') return;
+        if (permission !== 'granted') {
+          alert('Notifications were blocked. Please allow them in your browser settings and try again.');
+          return;
+        }
 
-        const token = await getToken(messaging, {
-          vapidKey:          VAPID_KEY,
-          serviceWorkerRegistration: await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        // Register Firebase service worker
+        const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+        await navigator.serviceWorker.ready;
+
+        // Get FCM token
+        const token = await messaging.getToken({
+          vapidKey: VAPID_KEY,
+          serviceWorkerRegistration: swReg
         });
 
         if (token) {
-          // Register this device with our backend
+          // Register with our backend
           await fetch(`${BACKEND_URL}/register`, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ token, platform: /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : 'android' })
+            body:    JSON.stringify({
+              token,
+              platform: /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : 'android'
+            })
           });
           localStorage.setItem('fcm-token', token);
+
+          // Show success
+          const btn = document.querySelector('[onclick*="initFirebasePush"]');
+          if (btn) {
+            btn.textContent = '✓ Notifications enabled!';
+            btn.style.background = 'var(--blush)';
+            setTimeout(() => { btn.textContent = '🔔 Enable surprise announcements'; }, 3000);
+          }
         }
 
         // Handle foreground messages
-        onMessage(messaging, (payload) => {
+        messaging.onMessage((payload) => {
           loadAnnouncements();
+          if (payload.notification) {
+            const { title, body } = payload.notification;
+            if (Notification.permission === 'granted') {
+              new Notification(title, { body, icon: '/icon.png' });
+            }
+          }
         });
 
       } catch (err) {
-        console.log('Push setup error:', err);
+        console.error('Firebase push error:', err);
+        alert('Could not enable notifications: ' + err.message);
       }
-    }
+    };
 
-    window.initFirebasePush = initFirebasePush;
+    // Auto-init if already granted
+    if (Notification.permission === 'granted' && !localStorage.getItem('fcm-token')) {
+      window.addEventListener('load', () => setTimeout(window.initFirebasePush, 2000));
+    }
   </script>
 
   <!-- iOS Safari Web Push support -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Matty &amp; Courtney">
 
