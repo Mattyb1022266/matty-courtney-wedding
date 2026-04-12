@@ -26,6 +26,32 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
+  <!-- OneSignal Push Notifications -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "608f5205-38ce-4d61-afcb-201301a315ab",
+        notifyButton: { enable: false },
+        promptOptions: {
+          slidedown: {
+            prompts: [{
+              type: "push",
+              autoPrompt: true,
+              text: {
+                actionMessage: "Matty & Courtney want to send you surprise announcements during the trip! Allow notifications?",
+                acceptButton: "Yes please!",
+                cancelButton: "Maybe later"
+              },
+              delay: { pageViews: 1, timeDelay: 3 }
+            }]
+          }
+        }
+      });
+    });
+  </script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -144,6 +170,34 @@
     /* ── SCHEDULE ROW ── */
     .sched-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
     .sched-time { color: var(--gold); font-size: 12px; min-width: 54px; padding-top: 1px; }
+
+    /* ── ANNOUNCEMENTS ── */
+    .announce-feed { padding: 0 14px; }
+    .announce-item { background: var(--white); border: 0.5px solid var(--petal); border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; position: relative; }
+    .announce-item.new-item { border-color: var(--rose); }
+    .announce-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .announce-emoji { font-size: 20px; line-height: 1; }
+    .announce-who { font-size: 11px; font-weight: 700; color: var(--rosedark); letter-spacing: 0.5px; }
+    .announce-time { font-size: 10px; color: var(--muted); margin-left: auto; }
+    .announce-msg { font-size: 13px; color: var(--text); line-height: 1.7; }
+    .announce-img { width: 100%; border-radius: 8px; margin-top: 10px; display: block; }
+    .announce-delete { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 14px; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+    .announce-delete:hover { background: var(--blush); }
+
+    /* ── ADMIN COMPOSE ── */
+    .compose-box { background: var(--white); border: 1.5px solid var(--rose); border-radius: 14px; padding: 14px 16px; margin: 0 14px 14px; }
+    .compose-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--rosedark); margin-bottom: 10px; display: block; }
+    .compose-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+    .compose-emoji-btn { width: 38px; height: 38px; background: var(--blush); border: 0.5px solid var(--petal); border-radius: 10px; font-size: 18px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .compose-textarea { flex: 1; border: 0.5px solid var(--petal); border-radius: 10px; padding: 9px 12px; font-size: 13px; font-family: 'Lato', sans-serif; color: var(--text); resize: none; min-height: 70px; background: var(--cream); }
+    .compose-textarea:focus { outline: none; border-color: var(--rose); }
+    .compose-actions { display: flex; gap: 8px; align-items: center; }
+    .compose-img-btn { background: var(--blush); border: 0.5px solid var(--petal); border-radius: 10px; padding: 8px 12px; font-size: 11px; color: var(--rosedark); cursor: pointer; font-family: 'Lato', sans-serif; white-space: nowrap; }
+    .compose-send-btn { flex: 1; background: var(--rose); color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-family: 'Lato', sans-serif; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+    .compose-send-btn:active { opacity: 0.85; }
+    .emoji-picker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; background: var(--white); border: 0.5px solid var(--petal); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+    .emoji-opt { font-size: 22px; padding: 4px; border-radius: 8px; cursor: pointer; text-align: center; border: none; background: none; }
+    .emoji-opt:hover { background: var(--blush); }
   </style>
 </head>
 <body>
@@ -194,6 +248,58 @@
         <div class="sched-row" style="color:var(--rosedark)"><div class="sched-time" style="color:var(--rosedark);font-weight:700">6 Apr ✨</div><div style="font-weight:700">The big day — full details revealed tomorrow!</div></div>
         <div class="sched-row"><div class="sched-time">7–15 Apr</div><div>More magic, memories &amp; celebrating together</div></div>
       </div>
+    </div>
+
+    <!-- ADMIN COMPOSE BOX — only visible in admin mode -->
+    <div id="compose-area" style="display:none">
+      <div style="padding:0 14px 8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">send an announcement</div>
+      <div class="compose-box">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <button class="compose-emoji-btn" id="emoji-toggle-btn" onclick="toggleEmojiPicker()">✨</button>
+          <span style="font-size:12px;color:var(--muted)">Tap emoji to change · guests see this instantly</span>
+        </div>
+        <div id="emoji-picker-panel" style="display:none">
+          <div class="emoji-picker">
+            <button class="emoji-opt" onclick="pickEmoji('✨')">✨</button>
+            <button class="emoji-opt" onclick="pickEmoji('🎉')">🎉</button>
+            <button class="emoji-opt" onclick="pickEmoji('🏰')">🏰</button>
+            <button class="emoji-opt" onclick="pickEmoji('💍')">💍</button>
+            <button class="emoji-opt" onclick="pickEmoji('🎢')">🎢</button>
+            <button class="emoji-opt" onclick="pickEmoji('🎶')">🎶</button>
+            <button class="emoji-opt" onclick="pickEmoji('🍽️')">🍽️</button>
+            <button class="emoji-opt" onclick="pickEmoji('🚌')">🚌</button>
+            <button class="emoji-opt" onclick="pickEmoji('📸')">📸</button>
+            <button class="emoji-opt" onclick="pickEmoji('🥂')">🥂</button>
+            <button class="emoji-opt" onclick="pickEmoji('🌸')">🌸</button>
+            <button class="emoji-opt" onclick="pickEmoji('🎁')">🎁</button>
+            <button class="emoji-opt" onclick="pickEmoji('🔥')">🔥</button>
+            <button class="emoji-opt" onclick="pickEmoji('😍')">😍</button>
+            <button class="emoji-opt" onclick="pickEmoji('🥳')">🥳</button>
+            <button class="emoji-opt" onclick="pickEmoji('💫')">💫</button>
+            <button class="emoji-opt" onclick="pickEmoji('🎠')">🎠</button>
+            <button class="emoji-opt" onclick="pickEmoji('🌟')">🌟</button>
+          </div>
+        </div>
+        <textarea class="compose-textarea" id="compose-text" placeholder="Type your announcement... e.g. 'Head to the pool at 3pm — we have a surprise! 🎉'"></textarea>
+        <div class="compose-actions">
+          <button class="compose-img-btn" onclick="document.getElementById('announce-img-input').click()">📷 Add photo</button>
+          <input type="file" id="announce-img-input" accept="image/*" style="display:none" onchange="previewAnnounceImg(this)">
+          <button class="compose-send-btn" onclick="sendAnnouncement()">Send to everyone ✦</button>
+        </div>
+        <div id="announce-img-preview" style="display:none;margin-top:10px;position:relative">
+          <img id="announce-img-thumb" style="width:100%;border-radius:8px;display:block">
+          <button onclick="clearAnnounceImg()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENT FEED — visible to all guests -->
+    <div id="announce-feed-wrap" style="display:none">
+      <div style="padding:0 14px 10px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">announcements</span>
+        <span id="announce-unread" style="display:none;background:var(--rose);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;letter-spacing:0.5px"></span>
+      </div>
+      <div class="announce-feed" id="announce-feed"></div>
     </div>
   </div>
 
@@ -527,6 +633,7 @@
     document.querySelector('.app').style.paddingTop = '38px';
     renderDayTab();
     renderRevealBanner();
+    loadAnnouncements();
   }
 
   function exitAdmin() {
@@ -536,6 +643,7 @@
     document.querySelector('.app').style.paddingTop = '0';
     renderDayTab();
     renderRevealBanner();
+    loadAnnouncements();
   }
 
   // Secret: tap the title 5 times to get the password prompt
@@ -794,6 +902,163 @@
 
   checkAdminMode();
   loadSavedPhotos();
+
+  // ============================================================
+  // ANNOUNCEMENTS SYSTEM
+  // ============================================================
+
+  let selectedEmoji = '✨';
+  let announceImgData = null;
+
+  function pickEmoji(e) {
+    selectedEmoji = e;
+    document.getElementById('emoji-toggle-btn').textContent = e;
+    document.getElementById('emoji-picker-panel').style.display = 'none';
+  }
+
+  function toggleEmojiPicker() {
+    const p = document.getElementById('emoji-picker-panel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function previewAnnounceImg(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        announceImgData = e.target.result;
+        document.getElementById('announce-img-thumb').src = e.target.result;
+        document.getElementById('announce-img-preview').style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function clearAnnounceImg() {
+    announceImgData = null;
+    document.getElementById('announce-img-preview').style.display = 'none';
+    document.getElementById('announce-img-input').value = '';
+  }
+
+  function sendAnnouncement() {
+    const text = document.getElementById('compose-text').value.trim();
+    if (!text) { alert('Please type a message first!'); return; }
+
+    const announcement = {
+      id: Date.now(),
+      emoji: selectedEmoji,
+      message: text,
+      img: announceImgData || null,
+      time: new Date().toISOString(),
+      from: 'Matty & Courtney'
+    };
+
+    // Save to localStorage
+    const all = JSON.parse(localStorage.getItem('announcements') || '[]');
+    all.unshift(announcement);
+    localStorage.setItem('announcements', JSON.stringify(all));
+
+    // Send push notification via OneSignal
+    if (window.OneSignalDeferred) {
+      OneSignalDeferred.push(function(OneSignal) {
+        fetch('https://onesignal.com/api/v1/notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic YOUR_REST_API_KEY'
+          },
+          body: JSON.stringify({
+            app_id: '608f5205-38ce-4d61-afcb-201301a315ab',
+            included_segments: ['All'],
+            headings: { en: 'Matty & Courtney ✨' },
+            contents: { en: selectedEmoji + ' ' + text },
+            url: window.location.href
+          })
+        }).catch(() => {}); // fails silently if REST key not set
+      });
+    }
+
+    // Clear form
+    document.getElementById('compose-text').value = '';
+    clearAnnounceImg();
+    document.getElementById('emoji-picker-panel').style.display = 'none';
+
+    // Refresh feed
+    loadAnnouncements();
+    alert('Announcement sent! 🌸 Everyone will see it on the Home screen and get a push notification.');
+  }
+
+  function loadAnnouncements() {
+    const all = JSON.parse(localStorage.getItem('announcements') || '[]');
+    const feed = document.getElementById('announce-feed');
+    const wrap = document.getElementById('announce-feed-wrap');
+    const composeArea = document.getElementById('compose-area');
+
+    // Show compose box only in admin mode
+    if (composeArea) composeArea.style.display = isAdminMode ? 'block' : 'none';
+
+    if (all.length === 0 && !isAdminMode) {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    wrap.style.display = 'block';
+    feed.innerHTML = '';
+
+    if (all.length === 0) {
+      feed.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--muted)">No announcements yet — use the box above to send your first one!</div>';
+      return;
+    }
+
+    // Track unread
+    const lastSeen = parseInt(localStorage.getItem('announcements-seen') || '0');
+    let unreadCount = 0;
+
+    all.forEach(a => {
+      const ts = new Date(a.time);
+      const timeStr = ts.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' · ' +
+                      ts.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      const isNew = a.id > lastSeen;
+      if (isNew) unreadCount++;
+
+      const div = document.createElement('div');
+      div.className = 'announce-item' + (isNew ? ' new-item' : '');
+      div.innerHTML = `
+        <div class="announce-meta">
+          <span class="announce-emoji">${a.emoji}</span>
+          <span class="announce-who">${a.from}</span>
+          <span class="announce-time">${timeStr}</span>
+          ${isAdminMode ? `<button class="announce-delete" onclick="deleteAnnouncement(${a.id})">🗑</button>` : ''}
+        </div>
+        <div class="announce-msg">${a.message}</div>
+        ${a.img ? `<img src="${a.img}" class="announce-img" alt="announcement photo">` : ''}
+      `;
+      feed.appendChild(div);
+    });
+
+    // Show unread badge
+    const badge = document.getElementById('announce-unread');
+    if (unreadCount > 0 && !isAdminMode) {
+      badge.textContent = unreadCount + ' new';
+      badge.style.display = 'inline-block';
+      // Mark as seen after 3 seconds
+      setTimeout(() => {
+        localStorage.setItem('announcements-seen', all[0].id);
+        badge.style.display = 'none';
+      }, 3000);
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function deleteAnnouncement(id) {
+    if (!confirm('Delete this announcement?')) return;
+    const all = JSON.parse(localStorage.getItem('announcements') || '[]');
+    const filtered = all.filter(a => a.id !== id);
+    localStorage.setItem('announcements', JSON.stringify(filtered));
+    loadAnnouncements();
+  }
+
+  loadAnnouncements();
 
   // ============================================================
   // SERVICE WORKER REGISTRATION
