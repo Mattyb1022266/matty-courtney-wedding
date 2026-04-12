@@ -4,7 +4,7 @@
 // Version: bump this number whenever you deploy an update
 // e.g. change 'v1' to 'v2' to force all guests to get the new version
 // ============================================================
-const CACHE_NAME = 'wedding-app-v4';
+const CACHE_NAME = 'wedding-app-v5';
 
 const ASSETS = [
   '/',
