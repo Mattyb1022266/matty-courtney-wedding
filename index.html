@@ -46,15 +46,65 @@
                 acceptButton: "Yes please!",
                 cancelButton: "Maybe later"
               },
-              delay: { pageViews: 1, timeDelay: 3 }
+              delay: { pageViews: 1, timeDelay: 2 }
             }]
           }
         }
       });
 
-      // Re-prompt anyone who previously dismissed
-      OneSignal.Slidedown.promptPush();
+      // Check permission state and prompt if not yet decided
+      const permission = await OneSignal.Notifications.permissionNative;
+      if (permission === 'default') {
+        setTimeout(async () => {
+          await OneSignal.Slidedown.promptPush({ force: true });
+        }, 2000);
+      }
     });
+
+    // Fallback: show a manual "Enable notifications" button if prompt doesn't fire
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const isStandalone = window.navigator.standalone === true;
+        if (isIOS && isStandalone && Notification.permission === 'default') {
+          showNotifyBanner();
+        }
+      }, 3000);
+    });
+
+    function showNotifyBanner() {
+      if (document.getElementById('notify-banner')) return;
+      const banner = document.createElement('div');
+      banner.id = 'notify-banner';
+      banner.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:200;background:#fff;border:1.5px solid #f0c4cb;border-radius:14px;padding:14px 16px;box-shadow:0 4px 20px rgba(168,82,96,0.15);display:flex;align-items:center;gap:12px;max-width:400px;margin:0 auto';
+      banner.innerHTML = `
+        <div style="font-size:26px">🔔</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#5a3040;margin-bottom:3px">Get surprise announcements!</div>
+          <div style="font-size:11px;color:#9a7080;line-height:1.5">Matty & Courtney will send notifications during the trip</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="enableNotifications()" style="background:#d4818e;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:Lato,sans-serif;white-space:nowrap">Enable ✓</button>
+          <button onclick="document.getElementById('notify-banner').remove()" style="background:none;border:none;color:#9a7080;font-size:11px;cursor:pointer;font-family:Lato,sans-serif">Not now</button>
+        </div>`;
+      document.body.appendChild(banner);
+    }
+
+    async function enableNotifications() {
+      document.getElementById('notify-banner')?.remove();
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.Slidedown.promptPush({ force: true });
+        const granted = await OneSignal.Notifications.requestPermission();
+        if (granted) {
+          const tick = document.createElement('div');
+          tick.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#a85260;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:300;font-family:Lato,sans-serif';
+          tick.textContent = '✓ Notifications enabled!';
+          document.body.appendChild(tick);
+          setTimeout(() => tick.remove(), 3000);
+        }
+      });
+    }
   </script>
 
   <!-- iOS Safari Web Push support — must be in <head> -->
