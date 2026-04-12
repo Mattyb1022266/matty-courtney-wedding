@@ -26,121 +26,59 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <!-- OneSignal Push Notifications -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "608f5205-38ce-4d61-afcb-201301a315ab",
-        notifyButton: { enable: false },
-        serviceWorkerParam: { scope: "/" },
-        serviceWorkerPath: "OneSignalSDKWorker.js",
-        promptOptions: {
-          slidedown: {
-            prompts: [{
-              type: "push",
-              autoPrompt: false,
-              text: {
-                actionMessage: "Matty & Courtney want to send you surprise announcements during the trip!",
-                acceptButton: "Yes please!",
-                cancelButton: "Maybe later"
-              }
-            }]
-          }
-        }
-      });
-    });
+  <!-- Firebase Cloud Messaging -->
+  <script type="module">
+    import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js';
 
-    // Detect platform
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isAndroid = /android/i.test(navigator.userAgent);
-    const isStandalone = window.navigator.standalone === true ||
-                         window.matchMedia('(display-mode: standalone)').matches;
-
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        const permission = typeof Notification !== 'undefined' ? Notification.permission : 'denied';
-        if (permission === 'granted') return; // Already enabled — do nothing
-
-        if (isIOS && isStandalone) {
-          showIOSGuide();
-        } else if (isAndroid || (!isIOS && permission === 'default')) {
-          showAndroidPrompt();
-        }
-      }, 2500);
-    });
-
-    function showIOSGuide() {
-      if (document.getElementById('notify-banner')) return;
-      const banner = document.createElement('div');
-      banner.id = 'notify-banner';
-      banner.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:200;background:#fff;border:1.5px solid #f0c4cb;border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(168,82,96,0.18);max-width:400px;margin:0 auto;font-family:Lato,sans-serif';
-      banner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div style="font-size:26px">🔔</div>
-          <div>
-            <div style="font-size:13px;font-weight:700;color:#5a3040">Get surprise announcements!</div>
-            <div style="font-size:11px;color:#9a7080">From Matty & Courtney during the trip</div>
-          </div>
-          <button onclick="document.getElementById('notify-banner').remove()" style="margin-left:auto;background:none;border:none;color:#9a7080;font-size:18px;cursor:pointer;padding:0 4px">×</button>
-        </div>
-        <div style="background:#fdf6f0;border-radius:10px;padding:11px 13px;margin-bottom:12px">
-          <div style="font-size:11px;font-weight:700;color:#a85260;margin-bottom:6px;letter-spacing:0.5px">TO ENABLE ON IPHONE:</div>
-          <div style="font-size:12px;color:#5a3040;line-height:1.8">
-            1. Open your iPhone <strong>Settings</strong><br>
-            2. Scroll down and tap <strong>Safari</strong><br>
-            3. Tap <strong>Notifications</strong><br>
-            4. Find <strong>matty-courtney-wedding</strong><br>
-            5. Toggle <strong>Allow Notifications ON</strong><br>
-            6. Come back and reopen the app
-          </div>
-        </div>
-        <button onclick="document.getElementById('notify-banner').remove()" style="width:100%;background:#d4818e;color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:Lato,sans-serif;letter-spacing:0.5px">Got it!</button>`;
-      document.body.appendChild(banner);
-    }
-
-    function showAndroidPrompt() {
-      if (document.getElementById('notify-banner')) return;
-      const banner = document.createElement('div');
-      banner.id = 'notify-banner';
-      banner.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:200;background:#fff;border:1.5px solid #f0c4cb;border-radius:16px;padding:16px;box-shadow:0 4px 24px rgba(168,82,96,0.18);max-width:400px;margin:0 auto;font-family:Lato,sans-serif';
-      banner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div style="font-size:26px">🔔</div>
-          <div>
-            <div style="font-size:13px;font-weight:700;color:#5a3040">Get surprise announcements!</div>
-            <div style="font-size:11px;color:#9a7080">Matty & Courtney will notify you during the trip</div>
-          </div>
-          <button onclick="document.getElementById('notify-banner').remove()" style="margin-left:auto;background:none;border:none;color:#9a7080;font-size:18px;cursor:pointer;padding:0 4px">×</button>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button onclick="document.getElementById('notify-banner').remove()" style="flex:1;background:#f0c4cb;color:#a85260;border:none;border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:Lato,sans-serif">Maybe later</button>
-          <button onclick="enableNotificationsAndroid()" style="flex:2;background:#d4818e;color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:Lato,sans-serif;font-weight:700">Enable notifications ✓</button>
-        </div>`;
-      document.body.appendChild(banner);
-    }
-
-    async function enableNotificationsAndroid() {
-      document.getElementById('notify-banner')?.remove();
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.Slidedown.promptPush({ force: true });
-      });
-    }
-
-    // Global function so admin can re-trigger notification prompt manually
-    window.retriggerNotifications = function() {
-      const permission = typeof Notification !== 'undefined' ? Notification.permission : 'denied';
-      if (permission === 'granted') {
-        alert('Notifications are already enabled on this device! ✓');
-        return;
-      }
-      if (isIOS) {
-        showIOSGuide();
-      } else {
-        showAndroidPrompt();
-      }
+    const firebaseConfig = {
+      apiKey:            "AIzaSyDfhLutM-WEKvI0b7ygZpCcXCvSl8TK1x4",
+      authDomain:        "wedding-notifications-606ad.firebaseapp.com",
+      projectId:         "wedding-notifications-606ad",
+      storageBucket:     "wedding-notifications-606ad.firebasestorage.app",
+      messagingSenderId: "397211596151",
+      appId:             "1:397211596151:web:6cda670dd7debfeebedd72"
     };
+
+    const VAPID_KEY    = 'BLutrcIVQRnUUQKTuWHXjeln8Sep5AGSmylUn-kFKzHK51OMIdHRAAhi--NyksdIg386c_BpOtNt85a77pL5Tao';
+    const BACKEND_URL  = 'https://wedding-push-backend-production.up.railway.app';
+
+    window.BACKEND_URL = BACKEND_URL;
+
+    async function initFirebasePush() {
+      try {
+        const firebaseApp = initializeApp(firebaseConfig);
+        const messaging   = getMessaging(firebaseApp);
+
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+
+        const token = await getToken(messaging, {
+          vapidKey:          VAPID_KEY,
+          serviceWorkerRegistration: await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        });
+
+        if (token) {
+          // Register this device with our backend
+          await fetch(`${BACKEND_URL}/register`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ token, platform: /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : 'android' })
+          });
+          localStorage.setItem('fcm-token', token);
+        }
+
+        // Handle foreground messages
+        onMessage(messaging, (payload) => {
+          loadAnnouncements();
+        });
+
+      } catch (err) {
+        console.log('Push setup error:', err);
+      }
+    }
+
+    window.initFirebasePush = initFirebasePush;
   </script>
 
   <!-- iOS Safari Web Push support -->
@@ -334,7 +272,7 @@
       <div class="card-title">Welcome, everyone!</div>
       <div class="card-body">You're invited on the adventure of a lifetime — two weeks at Walt Disney World with Matty &amp; Courtney. This is your holiday guide to help you get the most out of every magical day. We've kept a few details close to our hearts for now, but everything will be revealed when the moment is right. 🏰</div>
       <div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--petal)">
-        <button onclick="retriggerNotifications()" style="width:100%;background:var(--blush);color:var(--rosedark);border:0.5px solid var(--petal);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:0.5px">🔔 Enable surprise announcements</button>
+        <button onclick="if(window.initFirebasePush) window.initFirebasePush()" style="width:100%;background:var(--blush);color:var(--rosedark);border:0.5px solid var(--petal);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:0.5px">🔔 Enable surprise announcements</button>
       </div>
     </div>
 
@@ -1003,23 +941,27 @@
   loadSavedPhotos();
 
   // ============================================================
-  // ANNOUNCEMENTS SYSTEM
+  // ANNOUNCEMENTS SYSTEM — powered by Supabase
   // ============================================================
 
-  let selectedEmoji = '✨';
+  const SUPABASE_URL  = 'https://fsyjhgbobkqhovaoekzh.supabase.co';
+  const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzeWpoZ2JvYmtxaG92YW9la3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMTI4MTgsImV4cCI6MjA5MTU4ODgxOH0.wUouLTcXd7ONaoveyw_-EDkHcZyhuCgQD6NyiBcva-Y';
+
+  let selectedEmoji  = '✨';
   let announceImgData = null;
 
+  // ── Emoji picker ──────────────────────────────────────────────
   function pickEmoji(e) {
     selectedEmoji = e;
     document.getElementById('emoji-toggle-btn').textContent = e;
     document.getElementById('emoji-picker-panel').style.display = 'none';
   }
-
   function toggleEmojiPicker() {
     const p = document.getElementById('emoji-picker-panel');
     p.style.display = p.style.display === 'none' ? 'block' : 'none';
   }
 
+  // ── Image preview ─────────────────────────────────────────────
   function previewAnnounceImg(input) {
     if (input.files && input.files[0]) {
       const reader = new FileReader();
@@ -1031,133 +973,144 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
-
   function clearAnnounceImg() {
     announceImgData = null;
     document.getElementById('announce-img-preview').style.display = 'none';
     document.getElementById('announce-img-input').value = '';
   }
 
-  function sendAnnouncement() {
+  // ── Send announcement → Supabase ──────────────────────────────
+  async function sendAnnouncement() {
     const text = document.getElementById('compose-text').value.trim();
     if (!text) { alert('Please type a message first!'); return; }
 
-    const announcement = {
-      id: Date.now(),
-      emoji: selectedEmoji,
-      message: text,
-      img: announceImgData || null,
-      time: new Date().toISOString(),
-      from: 'Matty & Courtney'
-    };
+    const btn = document.querySelector('.compose-send-btn');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
 
-    // Save to localStorage
-    const all = JSON.parse(localStorage.getItem('announcements') || '[]');
-    all.unshift(announcement);
-    localStorage.setItem('announcements', JSON.stringify(all));
+    try {
+      const BACKEND = window.BACKEND_URL || 'https://wedding-push-backend-production.up.railway.app';
 
-    // Send push notification via OneSignal
-    if (window.OneSignalDeferred) {
-      OneSignalDeferred.push(function(OneSignal) {
-        fetch('https://onesignal.com/api/v1/notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic os_v2_app_mchvebjyzzgwdl6leajqdiyvvp7ukppri7de6hukp3ei3ovgyjamek25z6k4kqycvukce5lhladjjhardxgo5b2vtyjlcbz2aav6ani'
-          },
-          body: JSON.stringify({
-            app_id: '608f5205-38ce-4d61-afcb-201301a315ab',
-            included_segments: ['All'],
-            headings: { en: 'Matty & Courtney ✨' },
-            contents: { en: selectedEmoji + ' ' + text },
-            url: window.location.href
-          })
-        }).catch(() => {}); // fails silently if REST key not set
+      const res = await fetch(`${BACKEND}/announce`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          passcode: PREVIEW_PASSWORD,
+          message:  text,
+          emoji:    selectedEmoji,
+          img_url:  announceImgData || null
+        })
       });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+
+      document.getElementById('compose-text').value = '';
+      clearAnnounceImg();
+      document.getElementById('emoji-picker-panel').style.display = 'none';
+      selectedEmoji = '✨';
+      document.getElementById('emoji-toggle-btn').textContent = '✨';
+
+      await loadAnnouncements();
+
+      btn.textContent = `✓ Sent to ${data.successCount || 0} phones!`;
+      setTimeout(() => { btn.textContent = 'Send to everyone ✦'; btn.disabled = false; }, 3000);
+
+    } catch(err) {
+      alert('Something went wrong — check your connection and try again.');
+      btn.textContent = 'Send to everyone ✦';
+      btn.disabled = false;
     }
-
-    // Clear form
-    document.getElementById('compose-text').value = '';
-    clearAnnounceImg();
-    document.getElementById('emoji-picker-panel').style.display = 'none';
-
-    // Refresh feed
-    loadAnnouncements();
-    alert('Announcement sent! 🌸 Everyone will see it on the Home screen and get a push notification.');
   }
 
-  function loadAnnouncements() {
-    const all = JSON.parse(localStorage.getItem('announcements') || '[]');
-    const feed = document.getElementById('announce-feed');
-    const wrap = document.getElementById('announce-feed-wrap');
+  // ── Load announcements from Supabase ──────────────────────────
+  async function loadAnnouncements() {
+    const feed        = document.getElementById('announce-feed');
+    const wrap        = document.getElementById('announce-feed-wrap');
     const composeArea = document.getElementById('compose-area');
 
-    // Show compose box only in admin mode
     if (composeArea) composeArea.style.display = isAdminMode ? 'block' : 'none';
 
-    if (all.length === 0 && !isAdminMode) {
-      wrap.style.display = 'none';
-      return;
-    }
+    try {
+      const BACKEND = window.BACKEND_URL || 'https://wedding-push-backend-production.up.railway.app';
+      const res = await fetch(`${BACKEND}/announcements`);
+      const all = await res.json();
 
-    wrap.style.display = 'block';
-    feed.innerHTML = '';
+      if (!Array.isArray(all) || (all.length === 0 && !isAdminMode)) {
+        wrap.style.display = 'none';
+        return;
+      }
 
-    if (all.length === 0) {
-      feed.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--muted)">No announcements yet — use the box above to send your first one!</div>';
-      return;
-    }
+      wrap.style.display = 'block';
+      feed.innerHTML = '';
 
-    // Track unread
-    const lastSeen = parseInt(localStorage.getItem('announcements-seen') || '0');
-    let unreadCount = 0;
+      if (all.length === 0) {
+        feed.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--muted)">No announcements yet — use the box above to send your first one!</div>';
+        return;
+      }
 
-    all.forEach(a => {
-      const ts = new Date(a.time);
-      const timeStr = ts.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' · ' +
-                      ts.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-      const isNew = a.id > lastSeen;
-      if (isNew) unreadCount++;
+      const lastSeen    = parseInt(localStorage.getItem('announcements-seen') || '0');
+      let   unreadCount = 0;
 
-      const div = document.createElement('div');
-      div.className = 'announce-item' + (isNew ? ' new-item' : '');
-      div.innerHTML = `
-        <div class="announce-meta">
-          <span class="announce-emoji">${a.emoji}</span>
-          <span class="announce-who">${a.from}</span>
-          <span class="announce-time">${timeStr}</span>
-          ${isAdminMode ? `<button class="announce-delete" onclick="deleteAnnouncement(${a.id})">🗑</button>` : ''}
-        </div>
-        <div class="announce-msg">${a.message}</div>
-        ${a.img ? `<img src="${a.img}" class="announce-img" alt="announcement photo">` : ''}
-      `;
-      feed.appendChild(div);
-    });
+      all.forEach(a => {
+        const ts      = new Date(a.createdAt);
+        const timeStr = ts.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) +
+                        ' · ' + ts.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const isNew   = ts.getTime() > lastSeen;
+        if (isNew) unreadCount++;
 
-    // Show unread badge
-    const badge = document.getElementById('announce-unread');
-    if (unreadCount > 0 && !isAdminMode) {
-      badge.textContent = unreadCount + ' new';
-      badge.style.display = 'inline-block';
-      // Mark as seen after 3 seconds
-      setTimeout(() => {
-        localStorage.setItem('announcements-seen', all[0].id);
+        const div = document.createElement('div');
+        div.className = 'announce-item' + (isNew ? ' new-item' : '');
+        div.innerHTML = `
+          <div class="announce-meta">
+            <span class="announce-emoji">${a.emoji || '✨'}</span>
+            <span class="announce-who">Matty &amp; Courtney</span>
+            <span class="announce-time">${timeStr}</span>
+            ${isAdminMode ? `<button class="announce-delete" onclick="deleteAnnouncement('${a.id}')">🗑</button>` : ''}
+          </div>
+          <div class="announce-msg">${a.message}</div>
+          ${a.img_url ? `<img src="${a.img_url}" class="announce-img" alt="photo">` : ''}
+        `;
+        feed.appendChild(div);
+      });
+
+      const badge = document.getElementById('announce-unread');
+      if (unreadCount > 0 && !isAdminMode) {
+        badge.textContent = unreadCount + ' new';
+        badge.style.display = 'inline-block';
+        setTimeout(() => {
+          localStorage.setItem('announcements-seen', Date.now());
+          badge.style.display = 'none';
+        }, 3000);
+      } else {
         badge.style.display = 'none';
-      }, 3000);
-    } else {
-      badge.style.display = 'none';
+      }
+
+    } catch(err) {
+      console.log('Could not load announcements:', err);
     }
   }
 
-  function deleteAnnouncement(id) {
+  async function deleteAnnouncement(id) {
     if (!confirm('Delete this announcement?')) return;
-    const all = JSON.parse(localStorage.getItem('announcements') || '[]');
-    const filtered = all.filter(a => a.id !== id);
-    localStorage.setItem('announcements', JSON.stringify(filtered));
-    loadAnnouncements();
+    const BACKEND = window.BACKEND_URL || 'https://wedding-push-backend-production.up.railway.app';
+    await fetch(`${BACKEND}/announcements/${id}`, {
+      method:  'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ passcode: PREVIEW_PASSWORD })
+    });
+    await loadAnnouncements();
   }
 
+  // ── Poll for new announcements every 30 seconds ───────────────
+  // This means guests see new announcements within 30s of you sending
   loadAnnouncements();
+  setInterval(loadAnnouncements, 30000);
+
+  // ── Reload when app comes back into focus ─────────────────────
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) loadAnnouncements();
+  });
 
   // ============================================================
   // SERVICE WORKER REGISTRATION
